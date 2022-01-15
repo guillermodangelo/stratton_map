@@ -135,19 +135,19 @@ function getColor(d) {
   provider: new GeoSearch.OpenStreetMapProvider({
     params: {
       countrycodes: 'us',
-      limit: 5,
-      viewbox: [25.140,-80.866,26.337,-80.061]
+      viewbox: [-118.56, 33.50, -117.568, 34.412],
+      bounded: 1
     }
   }),
   showMarker: false, // optional: true|false  - default true
   showPopup: false, // optional: true|false  - default false
-  marker: {
-    icon: new L.Icon.Default(),
-    draggable: false,
-  },
-  popupFormat: ({ query, result }) => result.label, // optional: function    - default returns result label,
-  resultFormat: ({ result }) => result.label, // optional: function    - default returns result label
-  keepResult: true, // optional: true|false  - default false
+  //marker: {
+  //  icon: new L.Icon.Default(),
+  //  draggable: false,
+  //},
+  //popupFormat: ({ query, result }) => result.label, // optional: function    - default returns result label,
+  //resultFormat: ({ result }) => result.label, // optional: function    - default returns result label
+  //keepResult: true, // optional: true|false  - default false
   style: 'bar'
 });
 
