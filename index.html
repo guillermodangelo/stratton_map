@@ -139,8 +139,8 @@ function getColor(d) {
       viewbox: [25.140,-80.866,26.337,-80.061]
     }
   }),
-  showMarker: true, // optional: true|false  - default true
-  showPopup: true, // optional: true|false  - default false
+  showMarker: false, // optional: true|false  - default true
+  showPopup: false, // optional: true|false  - default false
   marker: {
     icon: new L.Icon.Default(),
     draggable: false,
@@ -152,9 +152,37 @@ function getColor(d) {
 });
 
 
+
+var polygons = [];
+
+for(var i = 0; i < hexgrid.features.length; i++) {
+    var obj = hexgrid.features[i];
+    polygons.push(obj);
+}
+
+var turf_polygons = turf.featureCollection(polygons);
+
+
+
 function searchEventHandler(result) {
-  var point = turf.featureCollection(turf.point([result.location.y, result.location.x]));
-  console.log(result.location.x, result.location.y);
+  var point = turf.featureCollection([
+    turf.point([result.location.x, result.location.y
+  ])
+]);
+
+  var tagged = turf.tag(point, turf_polygons, 'census_tract', 'census_tract');
+  var result = L.geoJSON(tagged);
+  result.addTo(map);
+
+  popup_text = tagged.features[0].properties.census_tract
+
+  if (popup_text == null){
+    popup_text = 'NO CORRESPONDE'
+  }
+
+  var popup = L.popup().setContent(popup_text);
+  result.bindPopup(popup).openPopup();
+console.log(tagged.features[0].properties.census_tract)
 }
 
 map.on('geosearch/showlocation', searchEventHandler);
@@ -189,33 +217,6 @@ var poly2 = turf.polygon([[
 
 
 
-
-var polygons = [];
-
-
-for(var i = 0; i < hexgrid.features.length; i++) {
-    var obj = hexgrid.features[i];
-    polygons.push(obj);
-}
-
-var turf_polygons = turf.featureCollection(polygons);
-
-
-var tagged = turf.tag(point, turf_polygons, 'census_tract', 'census_tract');
-
-var result = L.geoJSON(tagged)
-
-
-result.addTo(map);
-
-
-var popup = L.popup().setContent(tagged.features[0].properties.census_tract);
-
-result.bindPopup(popup).openPopup();
-
-
-
-console.log(tagged.features[0].properties.census_tract);
 
 //console.log(poly3.geometry.coordinates.features[0].properties.census_tract);
 
