@@ -64,6 +64,11 @@
     maxZoom: 19
   });
   
+  var OpenStreetMap_Mapnik = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	maxZoom: 19,
+	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  });
+
   //const extent = [26.069, -80.221]
   const extent = [34, -118.22]
 
@@ -71,12 +76,13 @@
 		center: extent,
 		zoom: 10,
     preferCanvas: true,
-		layers: CartoDB_Positron
+		layers: OpenStreetMap_Mapnik
 	});
 
   var baseLayers = {
-      "Image": Esri_WorldImagery,
-      "Roads": CartoDB_Positron
+    "OSM": OpenStreetMap_Mapnik,
+    "Image": Esri_WorldImagery,
+    "Roads": CartoDB_Positron
     };
 
 
@@ -110,13 +116,13 @@ function getColor(d) {
  
  var grid = L.geoJson(hexgrid, {
    onEachFeature: function (feature, layer) {
-/*      layer.bindPopup(
+     layer.bindPopup(
        '<br/><b>' + 'Asthma Danger Level: ' + '</b>' + feature.properties.danger_level + 
        '<br/><b>' + 'Asthma Danger Score: ' + '</b>' + feature.properties.danger_score +
        '<br/><b>' + 'Nearby City: ' + '</b>' + feature.properties.nearby_city + 
        '<br/><b>' + 'Zip Code: ' + '</b>' + feature.properties.zip + 
        '<br/><b>' + 'Census Tract: ' + '</b>' + feature.properties.census_tract
-     ); */
+     );
      },
    style: style,
    pane: 'myPane'
@@ -157,36 +163,71 @@ map.addControl(search);
 
 
 
-var pt1 = turf.point([-77, 44]);
-var pt2 = turf.point([-77, 38]);
-var poly1 = turf.polygon([[
+// var pt1 = turf.point([-77, 44]);
+
+// var pt2 = turf.point([-77, 38]);
+
+var pt3 = turf.point([-118.2860, 33.8854]);
+
+
+/* var poly1 = turf.polygon([[
   [-81, 41],
   [-81, 47],
   [-72, 47],
   [-72, 41],
   [-81, 41]
-]], {pop: 3000});
+]], {census_tract: 3000});
+
 var poly2 = turf.polygon([[
   [-81, 35],
   [-81, 41],
   [-72, 41],
   [-72, 35],
   [-81, 35]
-]], {pop: 1000});
+]], {census_tract: 1000}); */
 
-var points = turf.featureCollection([pt1]);
-var polygons = turf.featureCollection([poly1, poly2]);
 
-var tagged = turf.tag(points, polygons, 'pop', 'population');
+
+var points = turf.featureCollection([pt3]);
+
+
+var polygons = [];
+
+
+for(var i = 0; i < hexgrid.features.length; i++) {
+    var obj = hexgrid.features[i];
+    polygons.push(obj);
+}
+
+var turf_polygons = turf.featureCollection(polygons);
+
+
+var tagged = turf.tag(points, turf_polygons, 'census_tract', 'census_tract');
 
 var result = L.geoJSON(tagged)
 
 
 result.addTo(map);
 
-L.geoJSON(polygons).addTo(map);
 
-console.log(tagged.features[0].properties.population);
+var popup = L.popup().setContent(tagged.features[0].properties.census_tract);
+
+result.bindPopup(popup).openPopup();
+
+
+
+console.log(tagged.features[0].properties.census_tract);
+
+//console.log(poly3.geometry.coordinates.features[0].properties.census_tract);
+
+//console.log(hexgrid.features[0].properties.census_tract);
+//console.log(hexgrid.features.length);
+
+// console.log(poly2.properties);
+// console.log(polygons);
+// console.log(turf_polygons)
+// console.log(test)
+//6037291210
 
 /* map.on('click',function(e){
   var lat = e.latlng.lat;
