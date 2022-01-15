@@ -153,6 +153,7 @@ function getColor(d) {
 
 
 function searchEventHandler(result) {
+  var point = turf.featureCollection(turf.point([result.location.y, result.location.x]));
   console.log(result.location.x, result.location.y);
 }
 
@@ -167,7 +168,6 @@ map.addControl(search);
 
 // var pt2 = turf.point([-77, 38]);
 
-var pt3 = turf.point([-118.2860, 33.8854]);
 
 
 /* var poly1 = turf.polygon([[
@@ -188,7 +188,6 @@ var poly2 = turf.polygon([[
 
 
 
-var points = turf.featureCollection([pt3]);
 
 
 var polygons = [];
@@ -202,7 +201,7 @@ for(var i = 0; i < hexgrid.features.length; i++) {
 var turf_polygons = turf.featureCollection(polygons);
 
 
-var tagged = turf.tag(points, turf_polygons, 'census_tract', 'census_tract');
+var tagged = turf.tag(point, turf_polygons, 'census_tract', 'census_tract');
 
 var result = L.geoJSON(tagged)
 
