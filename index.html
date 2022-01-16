@@ -35,13 +35,31 @@
         margin-right: 6px;
         opacity: 0.7;
     }
+
+    #logoContainer {
+                    position: absolute;
+                    z-index: 100;
+                    top: 0;
+                    left: 45px;
+                    background-color: rgba(255, 255, 255, 0.8);
+                    width: 200px;
+                    height: 120px;
+    }
+
 </style>
 <style>body { padding: 0; margin: 0; } #map { height: 100%; width: 100vw; }</style>
 </head>
 
 <body>
   
-  <div id="map"></div>
+  <div id="map">
+    <div id="logoContainer">
+      <p><img src="logo2.png" alt="WorldVRE Logo" width="75%" height="75%" class="center"></p>
+      <p> Buy and sell virtual real estate<br>
+      <b> Current map: New York City, NY, USA</b></p>
+      <div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/565018069?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;" title="WorldVRE"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+      </div>
+  </div>
 
 
 
@@ -86,6 +104,11 @@
     };
 
 L.control.layers(baseLayers).addTo(map);
+
+var mapControlsContainer = document.getElementsByClassName("leaflet-control")[0];
+var logoContainer = document.getElementById("logoContainer");
+
+mapControlsContainer.appendChild(logoContainer);
 
 function getColor(d) {
 		return	d === 'HIGHEST' ? '#48194c' :
