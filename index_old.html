@@ -49,7 +49,6 @@
 <script src="https://unpkg.com/leaflet-geosearch@3.5.0/dist/geosearch.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="./data/hexgrid.js"></script>
-<script src="./data/miami.js"></script>
 <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
 
 
@@ -70,7 +69,8 @@
 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   });
 
-  const extent = [25.816, -80.234];
+  //const extent = [26.069, -80.221]
+  const extent = [34, -118.22]
 
 	var map = L.map('map', {
 		center: extent,
@@ -85,7 +85,10 @@
     "Roads": CartoDB_Positron
     };
 
+
 L.control.layers(baseLayers).addTo(map);
+
+
 
 function getColor(d) {
 		return	d === 'HIGHEST' ? '#48194c' :
@@ -111,7 +114,17 @@ function getColor(d) {
  map.getPane('myPane').style.opacity = 0.5;
  
  
- var county = L.geoJson(miami, {
+ var grid = L.geoJson(hexgrid, {
+   onEachFeature: function (feature, layer) {
+     layer.bindPopup(
+       '<br/><b>' + 'Asthma Danger Level: ' + '</b>' + feature.properties.danger_level + 
+       '<br/><b>' + 'Asthma Danger Score: ' + '</b>' + feature.properties.danger_score +
+       '<br/><b>' + 'Nearby City: ' + '</b>' + feature.properties.nearby_city + 
+       '<br/><b>' + 'Zip Code: ' + '</b>' + feature.properties.zip + 
+       '<br/><b>' + 'Census Tract: ' + '</b>' + feature.properties.census_tract
+     );
+     },
+   style: style,
    pane: 'myPane'
  }).addTo(map);
 
@@ -122,7 +135,7 @@ function getColor(d) {
   provider: new GeoSearch.OpenStreetMapProvider({
     params: {
       countrycodes: 'us',
-      viewbox: [-80.914, 25.115, -80.002, 26.379],
+      viewbox: [-118.56, 33.50, -117.568, 34.412],
       bounded: 1
     }
   }),
@@ -139,18 +152,16 @@ function getColor(d) {
 });
 
 
-map.addControl(search);
-
-
 
 var polygons = [];
 
-for(var i = 0; i < miami.features.length; i++) {
-    var obj = miami.features[i];
+for(var i = 0; i < hexgrid.features.length; i++) {
+    var obj = hexgrid.features[i];
     polygons.push(obj);
 }
 
 var turf_polygons = turf.featureCollection(polygons);
+
 
 
 function searchEventHandler(result) {
@@ -159,22 +170,86 @@ function searchEventHandler(result) {
   ])
 ]);
 
-  var tagged = turf.tag(point, turf_polygons, 'NAME', 'NAME');
+  var tagged = turf.tag(point, turf_polygons, 'census_tract', 'census_tract');
   var result = L.geoJSON(tagged);
   result.addTo(map);
 
-  popup_text = tagged.features[0].properties.NAME
+  popup_text = tagged.features[0].properties.census_tract
 
   if (popup_text == null){
-    popup_text = 'Outside the AOI'
+    popup_text = 'NO CORRESPONDE'
   }
 
   var popup = L.popup().setContent(popup_text);
   result.bindPopup(popup).openPopup();
+console.log(tagged.features[0].properties.census_tract)
 }
 
 map.on('geosearch/showlocation', searchEventHandler);
 
+map.addControl(search);
+
+
+
+
+// var pt1 = turf.point([-77, 44]);
+
+// var pt2 = turf.point([-77, 38]);
+
+
+
+/* var poly1 = turf.polygon([[
+  [-81, 41],
+  [-81, 47],
+  [-72, 47],
+  [-72, 41],
+  [-81, 41]
+]], {census_tract: 3000});
+
+var poly2 = turf.polygon([[
+  [-81, 35],
+  [-81, 41],
+  [-72, 41],
+  [-72, 35],
+  [-81, 35]
+]], {census_tract: 1000}); */
+
+
+
+
+
+//console.log(poly3.geometry.coordinates.features[0].properties.census_tract);
+
+//console.log(hexgrid.features[0].properties.census_tract);
+//console.log(hexgrid.features.length);
+
+// console.log(poly2.properties);
+// console.log(polygons);
+// console.log(turf_polygons)
+// console.log(test)
+//6037291210
+
+/* map.on('click',function(e){
+  var lat = e.latlng.lat;
+  var lon = e.latlng.lng;
+  var theMarker = L.marker([lat,lon], {
+  	icon: new L.Icon({iconUrl: 'https://leafletjs.com/examples/custom-icons/leaf-red.png'})
+  
+  }).addTo(map);
+
+  c.eachLayer(function(layer) {
+  	var inside = 
+      turf.booleanPointInPolygon(
+        theMarker.toGeoJSON(), 
+        grid.toGeoJSON()
+      )
+    ;
+    if (inside) {
+    	theMarker.setIcon(new L.Icon({iconUrl: 'https://leafletjs.com/examples/custom-icons/leaf-green.png'}));
+    }
+  });
+});
+ */
   
 </script>
 
