@@ -15,13 +15,13 @@
 </head>
 
 <body>
-  
-  <div id="map">
-    <div id="logoContainer">
-      <p><img src="logos/Stratton-logo-black.png" alt="Stratton Logo" width="75%" height="75%" class="center"></p>
-      <p><img src="logos/AHSF_Logo.png" alt="AIRBnb Logo" width="75%" height="75%" class="center"></p>
-      </div>
+
+  <div class="logoContainer">
+    <p><img src="logos/Stratton-logo-black.png" alt="Stratton Logo" width="70%" height="70%" class="center"></p>
+    <p><img src="logos/AHSF_Logo.png" alt="AIRBnb Logo" width="65%" height="65%" class="center"></p>
   </div>
+
+  <div id="map"></div>
 
 
 
@@ -79,10 +79,6 @@ var zoomHome = L.Control.zoomHome({
 zoomHome.addTo(map);
 
 
-var mapControlsContainer = document.getElementsByClassName("leaflet-control")[0];
-var logoContainer = document.getElementById("logoContainer");
-
-mapControlsContainer.appendChild(logoContainer);
 
 function getColor(d) {
 		return	d === 'HIGHEST' ? '#48194c' :
@@ -108,9 +104,15 @@ function getColor(d) {
  map.getPane('myPane').style.opacity = 0.5;
  
  
+
  var county = L.geoJson(mdbw_v3, {
    pane: 'myPane'
- }).addTo(map);
+ }).bindPopup(function (layer) {
+    return "<b> County: </b>" + layer.feature.properties.COUNTY + 
+    "</br>" + "<b> City: </b>" + layer.feature.properties.NAME + 
+    "</br>" + "<b> STR Regulation: </b>" + layer.feature.properties.STATUS +
+    "</br> <a href=" + layer.feature.properties.URL + " target=\"_blank\">Go to web-page</a>";
+}).addTo(map);
 
 
 
@@ -125,6 +127,7 @@ function getColor(d) {
   }),
   showMarker: false, // optional: true|false  - default true
   showPopup: false, // optional: true|false  - default false
+  searchLabel: 'Find your STR regulation', // optional: string
   //marker: {
   //  icon: new L.Icon.Default(),
   //  draggable: false,
@@ -149,6 +152,7 @@ for(var i = 0; i < mdbw_v3.features.length; i++) {
 
 var turf_polygons = turf.featureCollection(polygons);
 
+console.log(turf_polygons.features[0].properties)
 
 function searchEventHandler(result) {
   var point = turf.featureCollection([
@@ -159,9 +163,12 @@ function searchEventHandler(result) {
   var tagged = turf.tag(point, turf_polygons, 'NAME', 'NAME');
   var result = L.geoJSON(tagged);
   result.addTo(map);
+  console.log(tagged)
 
   popup_text = tagged.features[0].properties.NAME
 
+  console.log(tagged.features[0].properties)
+  
   if (popup_text == null){
     popup_text = 'Outside the AOI'
   }
