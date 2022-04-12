@@ -7,57 +7,19 @@
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch@3.5.0/dist/geosearch.css"/>
-  <title>Test map</title>
-  <style>
-    
-    body {
-    padding: 0;
-    margin: 0;
-   }
+  <link rel="stylesheet" href="/css/leaflet.zoomhome.css"/>
+  <link rel="stylesheet" href="/css/map.css"/>
 
-    html, body, #map {
-        height: 100%;
-        width: 100vw;
-    }
+  <title>Miami map V1</title>
 
-    .legend {
-    width: 200px;
-    text-align: left;
-    line-height: 23px;
-    color: #555;
-    clear: both;
-    }
-
-    .legend i {
-        width: 18px;
-        height: 18px;
-        float: left;
-        margin-right: 6px;
-        opacity: 0.7;
-    }
-
-    #logoContainer {
-                    position: absolute;
-                    z-index: 100;
-                    top: 0;
-                    left: 45px;
-                    background-color: rgba(255, 255, 255, 0.8);
-                    width: 200px;
-                    height: 120px;
-    }
-
-</style>
-<style>body { padding: 0; margin: 0; } #map { height: 100%; width: 100vw; }</style>
 </head>
 
 <body>
   
   <div id="map">
     <div id="logoContainer">
-      <p><img src="logo2.png" alt="WorldVRE Logo" width="75%" height="75%" class="center"></p>
-      <p> Buy and sell virtual real estate<br>
-      <b> Current map: New York City, NY, USA</b></p>
-      <div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/565018069?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;" title="WorldVRE"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+      <p><img src="logos/Stratton-logo-black.png" alt="Stratton Logo" width="75%" height="75%" class="center"></p>
+      <p><img src="logos/AHSF_Logo.png" alt="AIRBnb Logo" width="75%" height="75%" class="center"></p>
       </div>
   </div>
 
@@ -66,8 +28,8 @@
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-geosearch@3.5.0/dist/geosearch.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="./data/hexgrid.js"></script>
-<script src="./data/miami.js"></script>
+<script src="js/mdbw_v3.js"></script>
+<script src="js/leaflet.zoomhome.min.js"></script>
 <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
 
 
@@ -88,22 +50,34 @@
 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   });
 
+  var googleTerrain = L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
+    maxZoom: 20,
+    subdomains: ['mt0','mt1','mt2','mt3']
+  });
+
   const extent = [25.816, -80.234];
 
 	var map = L.map('map', {
 		center: extent,
 		zoom: 10,
+    zoomControl: false,
     preferCanvas: true,
-		layers: OpenStreetMap_Mapnik
+		layers: googleTerrain
 	});
 
   var baseLayers = {
-    "OSM": OpenStreetMap_Mapnik,
-    "Image": Esri_WorldImagery,
-    "Roads": CartoDB_Positron
+    "Roads": googleTerrain,
+    "Image": Esri_WorldImagery
     };
 
 L.control.layers(baseLayers).addTo(map);
+
+var zoomHome = L.Control.zoomHome({
+	position: 'bottomright',
+	zoomHomeIcon: 'rotate-right'
+	});
+zoomHome.addTo(map);
+
 
 var mapControlsContainer = document.getElementsByClassName("leaflet-control")[0];
 var logoContainer = document.getElementById("logoContainer");
@@ -134,7 +108,7 @@ function getColor(d) {
  map.getPane('myPane').style.opacity = 0.5;
  
  
- var county = L.geoJson(miami, {
+ var county = L.geoJson(mdbw_v3, {
    pane: 'myPane'
  }).addTo(map);
 
@@ -168,8 +142,8 @@ map.addControl(search);
 
 var polygons = [];
 
-for(var i = 0; i < miami.features.length; i++) {
-    var obj = miami.features[i];
+for(var i = 0; i < mdbw_v3.features.length; i++) {
+    var obj = mdbw_v3.features[i];
     polygons.push(obj);
 }
 

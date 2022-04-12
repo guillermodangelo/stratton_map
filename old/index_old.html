@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch@3.5.0/dist/geosearch.css"/>
+  <title>Test map</title>
+  <style>
+    
+    body {
+    padding: 0;
+    margin: 0;
+   }
+
+    html, body, #map {
+        height: 100%;
+        width: 100vw;
+    }
+
+    .legend {
+    width: 200px;
+    text-align: left;
+    line-height: 23px;
+    color: #555;
+    clear: both;
+    }
+
+    .legend i {
+        width: 18px;
+        height: 18px;
+        float: left;
+        margin-right: 6px;
+        opacity: 0.7;
+    }
+</style>
+<style>body { padding: 0; margin: 0; } #map { height: 100%; width: 100vw; }</style>
+</head>
+
+<body>
+  
+  <div id="map"></div>
+
+
+
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-geosearch@3.5.0/dist/geosearch.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="./data/hexgrid.js"></script>
+<script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
+
+
+<script>
+
+  var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+  });
+
+  var CartoDB_Positron = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 19
+  });
+  
+  var OpenStreetMap_Mapnik = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	maxZoom: 19,
+	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  });
+
+  //const extent = [26.069, -80.221]
+  const extent = [34, -118.22]
+
+	var map = L.map('map', {
+		center: extent,
+		zoom: 10,
+    preferCanvas: true,
+		layers: OpenStreetMap_Mapnik
+	});
+
+  var baseLayers = {
+    "OSM": OpenStreetMap_Mapnik,
+    "Image": Esri_WorldImagery,
+    "Roads": CartoDB_Positron
+    };
+
+
+L.control.layers(baseLayers).addTo(map);
+
+
+
+function getColor(d) {
+		return	d === 'HIGHEST' ? '#48194c' :
+            d === 'HIGH'    ? '#8856a7' :
+            d === 'LOWER'   ? '#8c96c6' :
+            d === 'LOWEST'  ? '#b3cde3' :
+                  '#8856a7';
+	}
+
+
+  function style(feature) {
+   var color = getColor(feature.properties.danger_level);
+   return {
+     fillColor: color ,
+     fillOpacity: 1,
+     color: color,
+     opacity: 1,
+     weight: 1,
+   };
+ }
+
+ map.createPane('myPane');
+ map.getPane('myPane').style.opacity = 0.5;
+ 
+ 
+ var grid = L.geoJson(hexgrid, {
+   onEachFeature: function (feature, layer) {
+     layer.bindPopup(
+       '<br/><b>' + 'Asthma Danger Level: ' + '</b>' + feature.properties.danger_level + 
+       '<br/><b>' + 'Asthma Danger Score: ' + '</b>' + feature.properties.danger_score +
+       '<br/><b>' + 'Nearby City: ' + '</b>' + feature.properties.nearby_city + 
+       '<br/><b>' + 'Zip Code: ' + '</b>' + feature.properties.zip + 
+       '<br/><b>' + 'Census Tract: ' + '</b>' + feature.properties.census_tract
+     );
+     },
+   style: style,
+   pane: 'myPane'
+ }).addTo(map);
+
+
+
+ const search = new GeoSearch.GeoSearchControl({
+  notFoundMessage: 'Address not found. Contact us to improve this tool.',
+  provider: new GeoSearch.OpenStreetMapProvider({
+    params: {
+      countrycodes: 'us',
+      viewbox: [-118.56, 33.50, -117.568, 34.412],
+      bounded: 1
+    }
+  }),
+  showMarker: false, // optional: true|false  - default true
+  showPopup: false, // optional: true|false  - default false
+  //marker: {
+  //  icon: new L.Icon.Default(),
+  //  draggable: false,
+  //},
+  //popupFormat: ({ query, result }) => result.label, // optional: function    - default returns result label,
+  //resultFormat: ({ result }) => result.label, // optional: function    - default returns result label
+  //keepResult: true, // optional: true|false  - default false
+  style: 'bar'
+});
+
+
+
+var polygons = [];
+
+for(var i = 0; i < hexgrid.features.length; i++) {
+    var obj = hexgrid.features[i];
+    polygons.push(obj);
+}
+
+var turf_polygons = turf.featureCollection(polygons);
+
+
+
+function searchEventHandler(result) {
+  var point = turf.featureCollection([
+    turf.point([result.location.x, result.location.y
+  ])
+]);
+
+  var tagged = turf.tag(point, turf_polygons, 'census_tract', 'census_tract');
+  var result = L.geoJSON(tagged);
+  result.addTo(map);
+
+  popup_text = tagged.features[0].properties.census_tract
+
+  if (popup_text == null){
+    popup_text = 'NO CORRESPONDE'
+  }
+
+  var popup = L.popup().setContent(popup_text);
+  result.bindPopup(popup).openPopup();
+console.log(tagged.features[0].properties.census_tract)
+}
+
+map.on('geosearch/showlocation', searchEventHandler);
+
+map.addControl(search);
+
+
+
+
+// var pt1 = turf.point([-77, 44]);
+
+// var pt2 = turf.point([-77, 38]);
+
+
+
+/* var poly1 = turf.polygon([[
+  [-81, 41],
+  [-81, 47],
+  [-72, 47],
+  [-72, 41],
+  [-81, 41]
+]], {census_tract: 3000});
+
+var poly2 = turf.polygon([[
+  [-81, 35],
+  [-81, 41],
+  [-72, 41],
+  [-72, 35],
+  [-81, 35]
+]], {census_tract: 1000}); */
+
+
+
+
+
+//console.log(poly3.geometry.coordinates.features[0].properties.census_tract);
+
+//console.log(hexgrid.features[0].properties.census_tract);
+//console.log(hexgrid.features.length);
+
+// console.log(poly2.properties);
+// console.log(polygons);
+// console.log(turf_polygons)
+// console.log(test)
+//6037291210
+
+/* map.on('click',function(e){
+  var lat = e.latlng.lat;
+  var lon = e.latlng.lng;
+  var theMarker = L.marker([lat,lon], {
+  	icon: new L.Icon({iconUrl: 'https://leafletjs.com/examples/custom-icons/leaf-red.png'})
+  
+  }).addTo(map);
+
+  c.eachLayer(function(layer) {
+  	var inside = 
+      turf.booleanPointInPolygon(
+        theMarker.toGeoJSON(), 
+        grid.toGeoJSON()
+      )
+    ;
+    if (inside) {
+    	theMarker.setIcon(new L.Icon({iconUrl: 'https://leafletjs.com/examples/custom-icons/leaf-green.png'}));
+    }
+  });
+});
+ */
+  
+</script>
+
+</body>
+
+</html>
