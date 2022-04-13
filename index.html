@@ -7,8 +7,10 @@
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch@3.5.0/dist/geosearch.css"/>
-  <link rel="stylesheet" href="/css/leaflet.zoomhome.css"/>
-  <link rel="stylesheet" href="/css/map.css"/>
+  <link rel="shortcut icon" href="logos/STR Favicon.png">
+  <link rel="stylesheet" href="css/leaflet.zoomhome.css"/>
+  <link rel="stylesheet" href="css/map.css"/>
+  
 
   <title>Miami map V1</title>
 
@@ -56,7 +58,7 @@
     subdomains: ['mt0','mt1','mt2','mt3']
   });
 
-  const extent = [25.816, -80.234];
+  const extent = [25.8, -80.234];
 
 	var map = L.map('map', {
 		center: extent,
@@ -171,16 +173,20 @@ function searchEventHandler(result) {
   var coords = L.latLng(result.location.y, result.location.x)
   var markerSearch = L.marker(coords).addTo(map);
   var results = leafletPip.pointInLayer(coords, county, first=true);
-  var popUpData = (results[0].feature.properties);
-  popUp = popUpMaker(
-    popUpData.COUNTY,
-    popUpData.NAME,
-    popUpData.STATUS,
-    popUpData.URL
-    );
+    if (results.length > 0) {
+      var popUpData = (results[0].feature.properties);
+        popUp = popUpMaker(
+          popUpData.COUNTY,
+          popUpData.NAME,
+          popUpData.STATUS,
+          popUpData.URL
+          );
+    } else {
+      var popUp = "<b>Short Term Rentals regulations are only available " + 
+                  "for Miami-Dade and Broward counties at the moment.</b>"
+    };
   markerSearch.bindPopup(popUp).openPopup();
-
-  };
+};
 
 
 map.on('geosearch/showlocation', searchEventHandler);
