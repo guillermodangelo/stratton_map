@@ -30,6 +30,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="js/mdbw_v3.js"></script>
 <script src="js/leaflet.zoomhome.min.js"></script>
+<script src="https://unpkg.com/@mapbox/leaflet-pip@latest/leaflet-pip.js"></script>
 <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
 
 
@@ -81,39 +82,64 @@ zoomHome.addTo(map);
 
 
 function getColor(d) {
-		return	d === 'HIGHEST' ? '#48194c' :
-            d === 'HIGH'    ? '#8856a7' :
-            d === 'LOWER'   ? '#8c96c6' :
-            d === 'LOWEST'  ? '#b3cde3' :
-                  '#8856a7';
+		return	d === 'Permitted' ? '#0868ac' :
+            d === 'Not permitted' ? '#cb181d' :
+            d === 'TBD' ? '#fee391' :
+            '#252525';
 	}
 
 
   function style(feature) {
-   var color = getColor(feature.properties.danger_level);
+   var color = getColor(feature.properties.STATUS);
    return {
-     fillColor: color ,
-     fillOpacity: 1,
      color: color,
-     opacity: 1,
      weight: 1,
    };
  }
 
  map.createPane('myPane');
- map.getPane('myPane').style.opacity = 0.5;
+ map.getPane('myPane').style.opacity = 1;
  
  
+ function popUpMaker(county, name, status, url) {
+    var countyHTML = `<b> County: </b> ${county} </br>`
+    var nameHTML = `<b> City: </b> ${name} </br>`
+    var statusHTML = `<b> STR Regulation: </b> ${status}`
+      if (url) {
+        var urlHTML = `</br> <a href="${url}" target="_blank">Go to web-page</a>`
+        var popUpContent = countyHTML + nameHTML + statusHTML + urlHTML
+      } else {
+        var popUpContent = countyHTML + nameHTML + statusHTML
+      }
+    return popUpContent;
+ }
 
  var county = L.geoJson(mdbw_v3, {
-   pane: 'myPane'
- }).bindPopup(function (layer) {
-    return "<b> County: </b>" + layer.feature.properties.COUNTY + 
-    "</br>" + "<b> City: </b>" + layer.feature.properties.NAME + 
-    "</br>" + "<b> STR Regulation: </b>" + layer.feature.properties.STATUS +
-    "</br> <a href=" + layer.feature.properties.URL + " target=\"_blank\">Go to web-page</a>";
-}).addTo(map);
+   pane: 'myPane',
+   onEachFeature: function (feature, layer) {
+    layer.bindPopup(
+      popUpMaker(
+        feature.properties.COUNTY,
+        feature.properties.NAME,
+        feature.properties.STATUS,
+        feature.properties.URL
+        )
+      );
+    },
+   style: style,
+  }).addTo(map);
 
+
+// var county = L.geoJson(mdbw_v3, {
+//    pane: 'myPane'
+//  }).addTo(map);
+
+
+//  county.bindPopup(
+//   popUpMaker(county.COUNTY, 'a', 'a', 'a')
+//    );
+
+//   console
 
 
  const search = new GeoSearch.GeoSearchControl({
@@ -141,43 +167,65 @@ function getColor(d) {
 
 map.addControl(search);
 
-
-
-var polygons = [];
-
-for(var i = 0; i < mdbw_v3.features.length; i++) {
-    var obj = mdbw_v3.features[i];
-    polygons.push(obj);
-}
-
-var turf_polygons = turf.featureCollection(polygons);
-
-console.log(turf_polygons.features[0].properties)
-
 function searchEventHandler(result) {
-  var point = turf.featureCollection([
-    turf.point([result.location.x, result.location.y
-  ])
-]);
+  var coords = L.latLng(result.location.y, result.location.x)
+  var markerSearch = L.marker(coords).addTo(map);
+  var results = leafletPip.pointInLayer(coords, county, first=true);
+  var popUpData = (results[0].feature.properties);
+  popUp = popUpMaker(
+    popUpData.COUNTY,
+    popUpData.NAME,
+    popUpData.STATUS,
+    popUpData.URL
+    );
+  markerSearch.bindPopup(popUp).openPopup();
 
-  var tagged = turf.tag(point, turf_polygons, 'NAME', 'NAME');
-  var result = L.geoJSON(tagged);
-  result.addTo(map);
-  console.log(tagged)
+  };
 
-  popup_text = tagged.features[0].properties.NAME
-
-  console.log(tagged.features[0].properties)
-  
-  if (popup_text == null){
-    popup_text = 'Outside the AOI'
-  }
-
-  var popup = L.popup().setContent(popup_text);
-  result.bindPopup(popup).openPopup();
-}
 
 map.on('geosearch/showlocation', searchEventHandler);
+
+
+// map.on('moveend', function() {
+// 			var layer = map.getLayerAt(200, 200);
+// 			var layerName = layer ? layer.options.name : 'none';
+// 			console.log(layerName)
+// 		}, 1000);
+
+// var polygons = [];
+
+// for(var i = 0; i < mdbw_v3.features.length; i++) {
+//     var obj = mdbw_v3.features[i];
+//     polygons.push(obj);
+// }
+
+// var turf_polygons = turf.featureCollection(polygons);
+
+// console.log(turf_polygons.features[0].properties)
+
+// function searchEventHandler(result) {
+//   var point = turf.featureCollection([
+//     turf.point([result.location.x, result.location.y
+//   ])
+// ]);
+
+//   var tagged = turf.tag(point, turf_polygons, 'NAME', 'NAME');
+//   var result = L.geoJSON(tagged);
+//   result.addTo(map);
+//   console.log(tagged)
+
+//   popup_text = tagged.features[0].properties.NAME
+
+//   console.log(tagged.features[0].properties)
+  
+//   if (popup_text == null){
+//     popup_text = 'Outside the AOI'
+//   }
+
+//   var popup = L.popup().setContent(popup_text);
+//   result.bindPopup(popup).openPopup();
+// }
+
 
   
 </script>
