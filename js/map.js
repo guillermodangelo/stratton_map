@@ -43,7 +43,6 @@ var zoomHome = L.Control.zoomHome({
 zoomHome.addTo(map);
 
 
-
 function getColor(d) {
 		return	d === 'Permitted' ? '#0868ac' :
             d === 'Not permitted' ? '#cb181d' :
@@ -93,18 +92,6 @@ function getColor(d) {
   }).addTo(map);
 
 
-// var county = L.geoJson(mdbw_v3, {
-//    pane: 'myPane'
-//  }).addTo(map);
-
-
-//  county.bindPopup(
-//   popUpMaker(county.COUNTY, 'a', 'a', 'a')
-//    );
-
-//   console
-
-
  const search = new GeoSearch.GeoSearchControl({
   notFoundMessage: 'Address not found. Contact us to improve this tool.',
   provider: new GeoSearch.OpenStreetMapProvider({
@@ -149,47 +136,4 @@ function searchEventHandler(result) {
   markerSearch.bindPopup(popUp).openPopup();
 };
 
-
 map.on('geosearch/showlocation', searchEventHandler);
-
-
-// map.on('moveend', function() {
-// 			var layer = map.getLayerAt(200, 200);
-// 			var layerName = layer ? layer.options.name : 'none';
-// 			console.log(layerName)
-// 		}, 1000);
-
-// var polygons = [];
-
-// for(var i = 0; i < mdbw_v3.features.length; i++) {
-//     var obj = mdbw_v3.features[i];
-//     polygons.push(obj);
-// }
-
-// var turf_polygons = turf.featureCollection(polygons);
-
-// console.log(turf_polygons.features[0].properties)
-
-// function searchEventHandler(result) {
-//   var point = turf.featureCollection([
-//     turf.point([result.location.x, result.location.y
-//   ])
-// ]);
-
-//   var tagged = turf.tag(point, turf_polygons, 'NAME', 'NAME');
-//   var result = L.geoJSON(tagged);
-//   result.addTo(map);
-//   console.log(tagged)
-
-//   popup_text = tagged.features[0].properties.NAME
-
-//   console.log(tagged.features[0].properties)
-  
-//   if (popup_text == null){
-//     popup_text = 'Outside the AOI'
-//   }
-
-//   var popup = L.popup().setContent(popup_text);
-//   result.bindPopup(popup).openPopup();
-// }
-
