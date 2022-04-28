@@ -39,3 +39,11 @@ a.leaflet-control-zoomhome-out {
 font-size: 1.5em;
 line-height: 26px;
 }
+
+
+/* leaflet button styling */
+.leaflet-control-geosearch .leaflet-geosearch-bar {
+  border-radius: 50px;
+  border-bottom: none;
+}
+
