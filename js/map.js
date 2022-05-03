@@ -114,12 +114,12 @@ function getColor(d) {
   //   style: 'bar'
   // });
 
-
+// 407 NW 64th St Miami
   const search = new GeoSearch.GeoSearchControl({
     notFoundMessage: 'Address not found. Contact us to improve this tool.',
     provider: new GeoSearch.GoogleProvider({
       params: {
-        key: '__API_KEY_HERE__',
+        key: '__API_KEY__',
         language: 'en',
         country: 'us',
         region: 'us',
