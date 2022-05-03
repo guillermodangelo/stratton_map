@@ -219,8 +219,9 @@
 }
 
 .leaflet-control-geosearch a.reset {
-  color: black;
+  color: rgb(37, 37, 37);
   font-weight: bold;
+  font-size: 12pt;
   position: absolute;
   line-height: 26px;
   padding: 0 8px;
@@ -234,7 +235,7 @@
 }
 
 .leaflet-touch .leaflet-control-geosearch a.reset {
-  line-height: 30px;
+  line-height: 40px;
 }
 
 .leaflet-control-geosearch a.reset:hover {
