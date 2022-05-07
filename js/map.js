@@ -67,51 +67,14 @@ map.getPane('myPane').style.opacity = 1;
    style: style,
   }).addTo(map);
 
-//724 NE 82 St Miami FL 33138
-
-  // const search = new GeoSearch.GeoSearchControl({
-  //   notFoundMessage: 'Address not found. Contact us to improve this tool.',
-  //   provider: new GeoSearch.OpenStreetMapProvider({
-  //     params: {
-  //       countrycodes: 'us',
-  //       viewbox: [-80.914, 25.115, -80.002, 26.379],
-  //       bounded: 1
-  //     }
-  //   }),
-  //   showMarker: false, // optional: true|false  - default true
-  //   showPopup: false, // optional: true|false  - default false
-  //   searchLabel: 'Find your STR regulation', // optional: string
-  //   //marker: {
-  //   //  icon: new L.Icon.Default(),
-  //   //  draggable: false,
-  //   //},
-  //   //popupFormat: ({ query, result }) => result.label, // optional: function    - default returns result label,
-  //   //resultFormat: ({ result }) => result.label, // optional: function    - default returns result label
-  //   //keepResult: true, // optional: true|false  - default false
-  //   style: 'bar'
-  // });
-
-  // const search = new GeoSearch.GeoSearchControl({
-  //   notFoundMessage: 'Address not found. Contact us to improve this tool.',
-  //   provider: new GeoSearch.OpenStreetMapProvider({
-  //   params: {
-  //     countrycodes: 'us',
-  //     viewbox: [-80.914, 25.115, -80.002, 26.379],
-  //     bounded: 1
-  //   }
-  //   }),
-  //   showMarker: false,
-  //   showPopup: false,
-  //   searchLabel: 'Find your STR regulation', 
-  //   style: 'bar'
-  // });
+// 724 NE 82 St Miami FL 33138
 
   
 const search = new GeoSearch.GeoSearchControl({
   notFoundMessage: 'Address not found. Contact us to improve this tool.',
   provider: new GeoSearch.MapBoxProvider({
   params: {
-    access_token: 'pk.eyJ1IjoiZ3VpbGxlcm1vZGFuZ2VsbyIsImEiOiJjbDJ0a3NvdXIwNDB4M2ZzMHFjMmN3ZXI0In0.Cie4-FjMpkk7Vkz3xICn4A',
+    access_token: '__MAPBOX_KEY__',
     countries: 'us',
     bbox: [-80.914, 25.115, -80.002, 26.379],
   }
@@ -121,27 +84,6 @@ const search = new GeoSearch.GeoSearchControl({
   searchLabel: 'Find your STR regulation', 
   style: 'bar'
 });
-
-
-
-// 407 NW 64th St Miami
-  // const search = new GeoSearch.GeoSearchControl({
-  //   notFoundMessage: 'Address not found. Contact us to improve this tool.',
-  //   provider: new GeoSearch.GoogleProvider({
-  //     params: {
-  //       key: '__API_KEY__',
-  //       language: 'en',
-  //       country: 'us',
-  //       region: 'us',
-  //       administrative_area_level_1: 'FL',
-  //       administrative_area_level_2: 'Miami-Dade, Broward'
-  //     }
-  //   }),
-  //   showMarker: false, // optional: true|false  - default true
-  //   showPopup: false, // optional: true|false  - default false
-  //   searchLabel: 'Find your STR regulation', // optional: string
-  //   style: 'bar'
-  // });
 
 
 map.addControl(search);
