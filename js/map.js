@@ -67,6 +67,7 @@ map.getPane('myPane').style.opacity = 1;
    style: style,
   }).addTo(map);
 
+//724 NE 82 St Miami FL 33138
 
   // const search = new GeoSearch.GeoSearchControl({
   //   notFoundMessage: 'Address not found. Contact us to improve this tool.',
@@ -90,20 +91,36 @@ map.getPane('myPane').style.opacity = 1;
   //   style: 'bar'
   // });
 
+  // const search = new GeoSearch.GeoSearchControl({
+  //   notFoundMessage: 'Address not found. Contact us to improve this tool.',
+  //   provider: new GeoSearch.OpenStreetMapProvider({
+  //   params: {
+  //     countrycodes: 'us',
+  //     viewbox: [-80.914, 25.115, -80.002, 26.379],
+  //     bounded: 1
+  //   }
+  //   }),
+  //   showMarker: false,
+  //   showPopup: false,
+  //   searchLabel: 'Find your STR regulation', 
+  //   style: 'bar'
+  // });
+
+  
 const search = new GeoSearch.GeoSearchControl({
-    notFoundMessage: 'Address not found. Contact us to improve this tool.',
-    provider: new GeoSearch.OpenStreetMapProvider({
-    params: {
-      countrycodes: 'us',
-      viewbox: [-80.914, 25.115, -80.002, 26.379],
-      bounded: 1
-    }
-    }),
-    showMarker: false,
-    showPopup: false,
-    searchLabel: 'Find your STR regulation', 
-    style: 'bar'
-  });
+  notFoundMessage: 'Address not found. Contact us to improve this tool.',
+  provider: new GeoSearch.MapBoxProvider({
+  params: {
+    access_token: 'pk.eyJ1IjoiZ3VpbGxlcm1vZGFuZ2VsbyIsImEiOiJjbDJ0a3NvdXIwNDB4M2ZzMHFjMmN3ZXI0In0.Cie4-FjMpkk7Vkz3xICn4A',
+    countries: 'us',
+    bbox: [-80.914, 25.115, -80.002, 26.379],
+  }
+  }),
+  showMarker: false,
+  showPopup: false,
+  searchLabel: 'Find your STR regulation', 
+  style: 'bar'
+});
 
 
 
